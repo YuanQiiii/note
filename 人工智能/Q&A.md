@@ -1,14 +1,3 @@
----
-title: Q&A
-date: 2024-03-28 17:49:28
-tags: 人工智能
-index_img: 
-banner_img: 
-description：
----
-
-
-
 ## Q&A
 
 ### 请为我详细介绍map(最大后验估计),并给出推导和每一步的推导依据

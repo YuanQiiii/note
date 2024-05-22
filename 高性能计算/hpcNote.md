@@ -1,14 +1,3 @@
----
-title: 高性能计算
-date: 2024-03-28 17:49:28
-tags: 高性能计算
-index_img: 
-banner_img: 
-description：
----
-
-
-
 ## Profiling
 
 - 阿姆达尔定律(优化热点的收益最大!!)

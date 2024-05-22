@@ -1,13 +1,3 @@
----
-title: c++ 编程基础
-date: 2024-03-28 17:49:28
-tags: 语言
-index_img: 
-banner_img: 
-description：
----
-
-
 ## 面向对象编程
 
 ### 类

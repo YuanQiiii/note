@@ -1,12 +1,3 @@
----
-title: latex
-date: 2024-03-28 17:49:28
-tags: 语言
-index_img: 
-banner_img: 
-description：
----
-
 ### 小写希腊字母
 
 ```latex
