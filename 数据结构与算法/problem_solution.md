@@ -3003,7 +3003,7 @@ class Solution:
 >   file2
 >   file3
 >   file4
->   
+>     
 >   DATA SET 2:
 >   ROOT
 >   file1
@@ -3233,6 +3233,372 @@ int main() {
       }
     }
     my_cout(dp[s.length() - 1][n]);
+  }
+  return 0;
+}
+
+```
+
+## [ OpenJudge - A:迷宫问题](http://cxsjsx.openjudge.cn/hw202416/A/)
+
+>- 总时间限制: 
+>
+>  1000ms
+>
+>- 内存限制: 
+>
+>  65536kB
+>
+>- 描述
+>
+>  定义一个二维数组：
+>
+>  ```
+>  int maze[5][5] = {
+>  
+>  0, 1, 0, 0, 0,
+>  
+>  0, 1, 0, 1, 0,
+>  
+>  0, 0, 0, 0, 0,
+>  
+>  0, 1, 1, 1, 0,
+>  
+>  0, 0, 0, 1, 0,
+>  
+>  };
+>  ```
+>
+>  它表示一个迷宫，其中的1表示墙壁，0表示可以走的路，只能横着走或竖着走，不能斜着走，要求编程序找出从左上角到右下角的最短路线。 
+>
+>- 输入
+>
+>  一个5 × 5的二维数组，表示一个迷宫。数据保证有唯一解。
+>
+>- 输出
+>
+>  左上角到右下角的最短路径，格式如样例所示。
+>
+>- 样例输入
+>
+>  ```
+>  0 1 0 0 0
+>  0 1 0 1 0
+>  0 0 0 0 0
+>  0 1 1 1 0
+>  0 0 0 1 0
+>  ```
+>
+>  
+>
+>- 样例输出
+>
+>  ```
+>  (0, 0)
+>  (1, 0)
+>  (2, 0)
+>  (2, 1)
+>  (2, 2)
+>  (2, 3)
+>  (2, 4)
+>  (3, 4)
+>  (4, 4)
+>  ```
+
+```c++
+#include <iostream>
+#include <queue>
+#include <utility>
+#include <vector>
+// 记录路径需要前驱节点(父节点)
+struct node {
+  int i, j;
+  node *prev;
+};
+using namespace std;
+int main() {
+  int g[5][5]{0};
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 5; j++) {
+      cin >> g[i][j];
+    }
+  }
+  // 初始化迷宫图
+  // 要寻找最短路径,使用广度优先搜索
+  queue<node *> q;
+  vector<pair<int, int>> path; // 记录路径的vector
+  bool found = false;
+  node *beginnode = new node{0, 0, nullptr};
+  q.push(beginnode);
+  int visited[5][5]{0};
+  int circle = 0; // 记录循环次数
+  node *endnode;
+  while (!q.empty()) {
+    int size = q.size();
+    for (int l = 0; l < size; l++) {
+      node *cur = q.front();
+      q.pop();
+      int i = cur->i, j = cur->j;
+      visited[i][j] = 1; // 标记为已访问
+      if (i == 4 && j == 4) {
+        found = true;
+        endnode = cur;
+        break; // 找到终点，退出循环
+      }
+      node *temp;
+      if (i + 1 < 5 && !visited[i + 1][j] && !g[i + 1][j]) {
+        temp = new node{i + 1, j, cur};
+        q.push(temp);
+      }
+      if (i - 1 >= 0 && !visited[i - 1][j] && !g[i - 1][j]) {
+        temp = new node{i - 1, j, cur};
+        q.push(temp);
+      }
+      if (j + 1 < 5 && !visited[i][j + 1] && !g[i][j + 1]) {
+        temp = new node{i, j + 1, cur};
+        q.push(temp);
+      }
+      if (j - 1 >= 0 && !visited[i][j - 1] && !g[i][j - 1]) {
+        temp = new node{i, j - 1, cur};
+        q.push(temp);
+      }
+    }
+    circle++;
+  }
+  while (endnode != nullptr) {
+    path.push_back({endnode->i, endnode->j});
+    endnode = endnode->prev; // 反向记录路径
+  }
+  for (int i = path.size() - 1; i >= 0; i--) {
+    cout << "(" << path[i].first << ", " << path[i].second << ")"
+         << endl; // 输出路径
+  }
+  //   cout << circle << endl; // 输出最短路径的长度
+  return 0;
+}
+```
+
+## [OpenJudge - B:棋盘问题](http://cxsjsx.openjudge.cn/hw202416/B/)
+
+>- 总时间限制: 
+>
+>  1000ms
+>
+>- 内存限制: 
+>
+>  65536kB
+>
+>- 描述
+>
+>  在一个给定形状的棋盘（形状可能是不规则的）上面摆放棋子，棋子没有区别。要求摆放时任意的两个棋子不能放在棋盘中的同一行或者同一列，请编程求解对于给定形状和大小的棋盘，摆放k个棋子的所有可行的摆放方案C。
+>
+>- 输入
+>
+>  输入含有多组测试数据。 每组数据的第一行是两个正整数，n k，用一个空格隔开，表示了将在一个n*n的矩阵内描述棋盘，以及摆放棋子的数目。 n <= 8 , k <= n 当为-1 -1时表示输入结束。 随后的n行描述了棋盘的形状：每行有n个字符，其中 # 表示棋盘区域， . 表示空白区域（数据保证不出现多余的空白行或者空白列）。 
+>
+>- 输出
+>
+>  对于每一组数据，给出一行输出，输出摆放的方案数目C （数据保证C<2^31）。
+>
+>- 样例输入
+>
+>  ```
+>  2 1
+>  #.
+>  .#
+>  4 4
+>  ...#
+>  ..#.
+>  .#..
+>  #...
+>  -1 -1
+>  ```
+>
+>  
+>
+>- 样例输出
+>
+>  ```.
+>  2
+>  1
+>  ```
+>
+>  
+>
+>- 来源
+>
+>  蔡错@pku
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+int n, k, way_count;
+void dfs(const vector<pair<int, int>> &pos, vector<int> &col, vector<int> &row,
+         int c, int start_index) {
+  if (c == k) {
+    way_count++;
+    return;
+  }
+  for (int i = start_index; i < pos.size(); i++) {  // 优化时间复杂度
+    int x = pos[i].first, y = pos[i].second; // 枚举合法的位置
+    if (col[x] || row[y]) { // 如果该位置被占用，跳过
+      continue;
+    }
+    col[x] = row[y] = 1;              // 标记该位置被占用
+    dfs(pos, col, row, c + 1, i + 1); // 继续搜索
+    col[x] = row[y] = 0; // 恢复该位置的状态，以便其他位置使用
+  }
+  return;
+}
+int main() {
+
+  while (cin >> n >> k) {
+    if (n == -1 && k == -1) {
+      break; // 输入结束
+    }
+    vector<vector<char>> board(n + 2, vector<char>(n + 2, '.'));
+    vector<int> col(n + 2, 0);
+    vector<int> row(n + 2, 0);
+    vector<pair<int, int>> pos;  // 优化时间复杂度
+    for (int i = 1; i <= n; i++) {
+      for (int j = 1; j <= n; j++) {
+        cin >> board[i][j]; // 输入棋盘状态
+        if (board[i][j] == '#') {
+          pos.push_back({i, j}); // 记录合法的位置
+        }
+      }
+    }
+    way_count = 0;            // 初始化方案数
+    dfs(pos, col, row, 0, 0); // 开始搜索
+    cout << way_count << endl; // 输出方案数(棋子无差别,除以全排列)
+  }
+  return 0;
+}
+```
+
+## [OpenJudge - C:海贼王之伟大航路](http://cxsjsx.openjudge.cn/hw202416/C/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   “我是要成为海贼王的男人！”，路飞一边喊着这样的口号，一边和他的伙伴们一起踏上了伟大航路的艰险历程。![img](./problem_solution.assets/1340073793.jpg)路飞他们伟大航路行程的起点是罗格镇，终点是拉夫德鲁（那里藏匿着“唯一的大秘宝”——ONE PIECE）。而航程中间，则是各式各样的岛屿。因为伟大航路上的气候十分异常，所以来往任意两个岛屿之间的时间差别很大，从A岛到B岛可能需要1天，而从B岛到A岛则可能需要1年。当然，任意两个岛之间的航行时间虽然差别很大，但都是已知的。现在假设路飞一行从罗格镇（起点）出发，遍历伟大航路中间所有的岛屿（但是已经经过的岛屿不能再次经过），最后到达拉夫德鲁（终点）。假设他们在岛上不作任何的停留，请问，他们最少需要花费多少时间才能到达终点？
+>
+> - 输入
+>
+>   输入数据包含多行。 第一行包含一个整数N(2 < N ≤ 16)，代表伟大航路上一共有N个岛屿（包含起点的罗格镇和终点的拉夫德鲁）。其中，起点的编号为1，终点的编号为N。 之后的N行每一行包含N个整数，其中，第i(1 ≤ i ≤ N)行的第j(1 ≤ j ≤ N)个整数代表从第i个岛屿出发到第j个岛屿需要的时间t(0 < t < 10000)。第i行第i个整数为0。
+>
+> - 输出
+>
+>   输出为一个整数，代表路飞一行从起点遍历所有中间岛屿（不重复）之后到达终点所需要的最少的时间。
+>
+> - 样例输入
+>
+>   ```
+>   样例输入1：
+>   4
+>   0 10 20 999
+>   5 0 90 30
+>   99 50 0 10
+>   999 1 2 0
+>   
+>   样例输入2：
+>   5
+>   0 18 13 98 8
+>   89 0 45 78 43 
+>   22 38 0 96 12
+>   68 19 29 0 52
+>   95 83 21 24 0
+>   ```
+>
+>   
+>
+> - 样例输出
+>
+>   ```
+>   样例输出1：
+>   100
+>   
+>   样例输出2：
+>   137
+>   ```
+>
+>   
+>
+> - 提示
+>
+>   提示： 对于样例输入1：路飞选择从起点岛屿1出发，依次经过岛屿3，岛屿2，最后到达终点岛屿4。花费时间为20+50+30=100。 对于样例输入2：可能的路径及总时间为：
+>
+>    1,2,3,4,5: 18+45+96+52=211 
+>
+>   1,2,4,3,5: 18+78+29+12=137 
+>
+>   1,3,2,4,5: 13+38+78+52=181 
+>
+>   1,3,4,2,5: 13+96+19+43=171 
+>
+>   1,4,2,3,5: 98+19+45+12=174 
+>
+>   1,4,3,2,5: 98+29+38+43=208 
+>
+>   所以最短的时间花费为137 单纯的枚举在N=16时需要14!次运算，一定会超时。
+
+```c++
+#include <climits>
+#include <cstring>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int n = 0;
+int min_time[1 << 16][17]{0};
+int min_time_all = INT_MAX; // 初始化为最大值
+
+void dfs(int end_sit, int pos, int time, int visited,
+         const vector<vector<int>> &dist) {
+  if (time >= min_time[visited][pos]) {
+    return; // 剪枝
+  } else {
+    min_time[visited][pos] = time;
+  }
+  if (visited == end_sit) {
+    min_time_all = min(min_time_all, time + dist[pos][n]);
+    return;
+  }
+  for (int i = 2; i < n; i++) {
+    if (!(visited & (1 << i))) {
+      int new_visited = visited | (1 << i);
+      dfs(end_sit, i, time + dist[pos][i], new_visited, dist);
+    }
+  }
+  return;
+}
+// 注意状态压缩的使用和状态的初始和终止条件以及状态的转移
+int main() {
+  while (cin >> n) {
+    vector<vector<int>> dist(n + 1, vector<int>(n + 1, 0));
+    for (int i = 1; i <= n; i++) {
+      for (int j = 1; j <= n; j++) {
+        cin >> dist[i][j];
+      }
+    }
+    // 状态压缩
+    int end_sit = 0;
+    for (int i = 0; i < n; i++) {
+      end_sit |= (1 << i);
+    }
+    memset(min_time, 0x3f, sizeof(min_time));
+    min_time_all = INT_MAX;
+    dfs(end_sit, 1, 0, 3, dist);
+    cout << min_time_all << endl;
   }
   return 0;
 }
