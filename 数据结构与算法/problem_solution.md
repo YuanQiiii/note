@@ -2926,3 +2926,316 @@ class Solution:
 ```
 
 - 注意不要混淆**C++/C**和**Python**的**数组**表示方式和**逻辑连接词**
+
+
+
+## B:文件结构“图”
+
+> - 总时间限制: 
+> - 1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   在计算机上看到文件系统的结构通常很有用。Microsoft Windows上面的"explorer"程序就是这样的一个例子。但是在有图形界面之前，没有图形化的表示方法的，那时候最好的方式是把目录和文件的结构显示成一个"图"的样子，而且使用缩排的形式来表示目录的结构。比如： 
+>
+>   ```
+>   ROOT
+>   |     dir1
+>   |     file1
+>   |     file2
+>   |     file3
+>   |     dir2
+>   |     dir3
+>   |     file1
+>   file1
+>   file2
+>   ```
+>
+>    这个图说明：ROOT目录包括三个子目录和两个文件。第一个子目录包含3个文件，第二个子目录是空的，第三个子目录包含一个文件。 
+>
+> - 输入
+>
+>   你的任务是写一个程序读取一些测试数据。每组测试数据表示一个计算机的文件结构。每组测试数据以'*'结尾，而所有合理的输入数据以'#'结尾。一组测试数据包括一些文件和目录的名字（虽然在输入中我们没有给出，但是我们总假设ROOT目录是最外层的目录）。在输入中,以']'表示一个目录的内容的结束。目录名字的第一个字母是'd'，文件名字的第一个字母是'f'。文件名可能有扩展名也可能没有（比如fmyfile.dat和fmyfile）。文件和目录的名字中都不包括空格,长度都不超过30。一个目录下的子目录个数和文件个数之和不超过30。
+>
+> - 输出
+>
+>   在显示一个目录中内容的时候，先显示其中的子目录（如果有的话），然后再显示文件（如果有的话）。文件要求按照名字的字母表的顺序显示（目录不用按照名字的字母表顺序显示，只需要按照目录出现的先后显示）。对每一组测试数据，我们要先输出"DATA SET x:"，这里x是测试数据的编号（从1开始）。在两组测试数据之间要输出一个空行来隔开。  你需要注意的是，我们使用一个'|'和5个空格来表示出缩排的层次。
+>
+> - 样例输入
+>
+>   ```
+>   file1
+>   file2
+>   dir3
+>   dir2
+>   file1
+>   file2
+>   ]
+>   ]
+>   file4
+>   dir1
+>   ]
+>   file3
+>   *
+>   file2
+>   file1
+>   *
+>   #
+>   ```
+>
+>   
+>
+> - 样例输出
+>
+>   ```
+>   DATA SET 1:
+>   ROOT
+>   |     dir3
+>   |     |     dir2
+>   |     |     file1
+>   |     |     file2
+>   |     dir1
+>   file1
+>   file2
+>   file3
+>   file4
+>   
+>   DATA SET 2:
+>   ROOT
+>   file1
+>   file2
+>   ```
+>
+>   
+>
+> - 提示
+>
+>   一个目录和它的子目录处于不同的层次 一个目录和它的里面的文件处于同一层次
+>
+> - 来源
+>
+>   翻译自 Pacific Northwest 1998 的试题
+
+```c++
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
+using namespace std;
+map<int, vector<string>> level_stack;
+void space_level(int t_level = 0) { // 输出空格，用于缩进文件树，level 初始值0
+  while (t_level > 0) {
+    cout << "|     ";
+    t_level--;
+  }
+}
+
+void f(const vector<string> &tg, int level,
+       int my_index) { // my_index 初始值-1
+  if (my_index == -1) {
+    cout << "ROOT" << endl;
+    f(tg, level, my_index + 1);
+  } else {
+    if (tg[my_index][0] == 'f') {
+      level_stack[level].push_back(tg[my_index]);
+      f(tg, level, my_index + 1);
+    } else if (tg[my_index][0] == 'd') {
+      level++;
+      space_level(level);
+      cout << tg[my_index] << endl;
+      f(tg, level, my_index + 1);
+    } else if (tg[my_index][0] == ']') {
+      if (level - 1 >= 0) {
+        sort(level_stack[level].begin(), level_stack[level].end());
+        for (auto item : level_stack[level]) {
+          space_level(level);
+          cout << item << endl;
+        }
+        level_stack[level].clear();
+      }
+      f(tg, level - 1, my_index + 1);
+    } else if (tg[my_index][0] == '*') {
+      sort(level_stack[level].begin(), level_stack[level].end());
+      for (auto item : level_stack[level]) {
+        space_level(level);
+        cout << item << endl;
+      }
+      level_stack[level].clear();
+      return;
+    }
+  }
+}
+
+int main() {
+  string temp;
+  int my_count = 0;
+  vector<vector<string>> atg;
+  atg.push_back(vector<string>());
+  while (cin >> temp) {
+    if (temp == "#") {
+      break;
+    } else if (temp == "*") {
+      atg[my_count].push_back("*");
+      atg.push_back(vector<string>());
+      my_count++;
+    } else {
+      atg[my_count].push_back(temp);
+    }
+  }
+
+  atg.pop_back(); // 移除最后一个空vector<string>
+  int i = 0;
+  while (i < my_count) {
+    cout << "DATA SET " << i + 1 << ":" << endl;
+    f(atg[i], 0, -1);
+    cout << endl;
+    i++;
+  }
+  return 0;
+}
+```
+
+## B:最佳加法表达式
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   给定n个1到9的数字，要求在数字之间摆放m个加号(加号两边必须有数字），使得所得到的加法表达式的值最小，并输出该值。例如，在1234中摆放1个加号，最好的摆法就是12+34,和为36 
+>
+> - 输入
+>
+>   有不超过15组数据 每组数据两行。第一行是整数m，表示有m个加号要放( 0<=m<=50) 第二行是若干个数字。数字总数n不超过50,且 m <= n-1
+>
+> - 输出
+>
+>   对每组数据，输出最小加法表达式的值
+>
+> - 样例输入
+>
+>   `2 123456 `
+>
+>   `1 123456`
+>
+>   ` 4 12345 `
+>
+> - 样例输出
+>
+>   `102`
+>
+>   ` 579 ` 
+>
+>    `15 `
+>
+> - 提示
+>
+>   要用到高精度计算，即用数组来存放long long 都装不下的大整数，并用模拟列竖式的办法进行大整数的加法。
+>
+> - 来源
+>
+>   Guo Wei
+
+
+
+```c++
+#include <iostream>
+#include <string>
+using namespace std;
+
+string my_add(const string &a, const string &b) {
+  string ans(max(a.size(), b.size()) + 1, '0');
+  string ra(a.rbegin(), a.rend());
+  string rb(b.rbegin(), b.rend());
+  int t = 0;
+  for (int i = 0; i < max(a.size(), b.size()) || t; i++) {
+    if (i < a.size())
+      t += ra[i] - '0';
+    if (i < b.size())
+      t += rb[i] - '0';
+    ans[i] = t % 10 + '0';
+    t /= 10;
+  }
+  return string(ans.rbegin(), ans.rend());
+}
+bool is_smaller(const string &a, const string &b) {
+  int ai = 0, bi = 0;
+  while (a[ai] == '0') { // 字符0不是0
+    ai++;
+  }
+  while (b[bi] == '0') {
+    bi++;
+  }
+  string ra(a.substr(ai)), rb(b.substr(bi));
+  int n = ra.size(), m = rb.size();
+  if (n != m)
+    return n < m;
+  for (int i = 0; i < n; i++)
+    if (ra[i] != rb[i])
+      return ra[i] - '0' < rb[i] - '0';
+  return false;
+}
+void my_cout(const string &s) {
+  int k;
+  for (int i = 0; i < s.length(); i++) {
+    if (s[i] != '0') {
+      k = i; // 第一个不为0的位置
+      break;
+    }
+  }
+  for (int i = k; i < s.length(); i++) {
+    cout << s[i];
+  }
+  cout << endl;
+  return;
+}
+int main() {
+  string dp[70][70]; // 在current_index位置放add_count个加号的最小值
+  int n;             // 加号的数目
+  while (cin >> n) {
+    string s;
+    cin >> s;
+
+    for (int i = 0; i < 70; i++) {
+      for (int j = 0; j < 70; j++) {
+        dp[i][j] =
+            "99999999999999999999999999999999999999999999"; // 初始化,一个足够大的数
+      }
+    }
+    for (int i = 0; i < s.length(); i++) {
+      dp[i][0] = s.substr(0, i + 1); // 初始化,没有加号的情况
+    }
+    for (int i = 0; i < s.length(); i++) {
+      // 考虑一个从0到第i个字符的串(共i+1个字符,可以放i个加号)
+      string target = s.substr(0, i + 1);
+      for (int j = 1; (j < i + 1 && j <= n); j++) {
+        // 考虑在上述串中放入j个加号,j既要小于等于n,还要小于等于i
+        // 设置初始值
+        // 考虑在第k个字符之后放下加号,即到第k个字符截至中已经放了j-1个加号,第k个字符之后放1个加号,将目标串劈分成[0,k]和[k+1,i]
+        for (int k = 0; k < i; k++) {
+          string behind = target.substr(k + 1);
+          string calu = my_add(behind, dp[k][j - 1]);
+          if (is_smaller(calu, dp[i][j])) {
+            dp[i][j] = calu;
+          }
+        }
+      }
+    }
+    my_cout(dp[s.length() - 1][n]);
+  }
+  return 0;
+}
+
+```
+
