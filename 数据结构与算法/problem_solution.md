@@ -3003,7 +3003,7 @@ class Solution:
 >   file2
 >   file3
 >   file4
->         
+>           
 >   DATA SET 2:
 >   ROOT
 >   file1
@@ -3508,7 +3508,7 @@ int main() {
 >   5 0 90 30
 >   99 50 0 10
 >   999 1 2 0
->       
+>         
 >   样例输入2：
 >   5
 >   0 18 13 98 8
@@ -3525,7 +3525,7 @@ int main() {
 >   ```
 >   样例输出1：
 >   100
->       
+>         
 >   样例输出2：
 >   137
 >   ```
@@ -3739,3 +3739,177 @@ int main() {
 }
 ```
 
+## [OpenJudge - A:Saving Tang Monk](http://cxsjsx.openjudge.cn/hw202417/A/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   《Journey to the West》(also 《Monkey》) is one of the Four Great Classical Novels of Chinese literature. It was written by Wu Cheng'en during the Ming Dynasty. In this novel, Monkey King Sun Wukong, pig Zhu Bajie and Sha Wujing, escorted Tang Monk to India to get sacred Buddhism texts.During the journey, Tang Monk was often captured by demons. Most of demons wanted to eat Tang Monk to achieve immortality, but some female demons just wanted to marry him because he was handsome. So, fighting demons and saving Monk Tang is the major job for Sun Wukong to do.Once, Tang Monk was captured by the demon White Bones. White Bones lived in a palace and she cuffed Tang Monk in a room. Sun Wukong managed to get into the palace. But to rescue Tang Monk, Sun Wukong might need to get some keys and kill some snakes in his way.The palace can be described as a matrix of characters. Each character stands for a room. In the matrix, 'K' represents the original position of Sun Wukong, 'T' represents the location of Tang Monk and 'S' stands for a room with a snake in it. Please note that there are only one 'K' and one 'T', and at most five snakes in the palace. And, '.' means a clear room as well '#' means a deadly room which Sun Wukong couldn't get in.There may be some keys of different kinds scattered in the rooms, but there is at most one key in one room. There are at most 9 kinds of keys. A room with a key in it is represented by a digit(from '1' to '9'). For example, '1' means a room with a first kind key, '2' means a room with a second kind key, '3' means a room with a third kind key... etc. To save Tang Monk, Sun Wukong must get ALL kinds of keys(in other words, at least one key for each kind).For each step, Sun Wukong could move to the adjacent rooms(except deadly rooms) in 4 directions(north,west,south and east), and each step took him one minute. If he entered a room in which a living snake stayed, he must kill the snake. Killing a snake also took one minute. If Sun Wukong entered a room where there is a key of kind N, Sun would get that key if and only if he had already got keys of kind 1,kind 2 ... and kind N-1. In other words, Sun Wukong must get a key of kind N before he could get a key of kind N+1 (N>=1). If Sun Wukong got all keys he needed and entered the room in which Tang Monk was cuffed, the rescue mission is completed. If Sun Wukong didn't get enough keys, he still could pass through Tang Monk's room. Since Sun Wukong was a impatient monkey, he wanted to save Tang Monk as quickly as possible. Please figure out the minimum time Sun Wukong needed to rescue Tang Monk.
+>
+> - 输入
+>
+>   There are several test cases.  For each case, the first line includes two integers N and M(0 < N <= 100, 0 <= M <= 9), meaning that the palace is a N * N matrix and Sun Wukong needed M kinds of keys(kind 1, kind 2, ... kind M).  Then the N*N matrix follows.  The input ends with N = 0 and M = 0.
+>
+> - 输出
+>
+>   For each test case, print the minimum time (in minute) Sun Wokong needed to save Tang Monk. If it's impossible for Sun Wokong to complete the mission, print "impossible".
+>
+> - 样例输入
+>
+> - ```
+>   3 1
+>   K.S
+>   ##1
+>   1#T
+>   3 1
+>   K#T
+>   .S#
+>   1#.
+>   3 2
+>   K#T
+>   .S.
+>   21.
+>   0 0
+>   ```
+>
+> - 样例输出
+>
+> - ```
+>   5
+>   impossible
+>   8
+>   ```
+
+```c++
+#include <iostream>
+#include <map>
+#include <queue>
+#include <tuple>
+#include <vector>
+
+using namespace std;
+
+// 定义状态结构体
+struct State {
+  int i, j, keys, time, snake; // 分别表示当前位置的行、列坐标，拥有的钥匙数量，当前时间，蛇的状态
+  State(int _i, int _j, int _keys, int _time, int _snake)
+      : i(_i), j(_j), keys(_keys), time(_time), snake(_snake) {}
+
+  // 重载小于运算符，用于优先队列
+  bool operator<(const State &other) const {
+    return time > other.time; // 时间越短优先级越高
+  }
+};
+
+int main() {
+  int n, m; // n表示地图大小，m表示钥匙数量
+  while (cin >> n >> m) { // 不断读取地图大小和钥匙数量，直到n和m都为0时结束循环
+    if (n == 0 && m == 0) { // 如果地图大小和钥匙数量都为0，结束循环
+      break;
+    }
+
+    // 创建地图二维数组，起点、终点坐标，蛇的数量计数器，蛇的位置映射表
+    vector<vector<char>> palace(n, vector<char>(n));
+    pair<int, int> start, target; // 起点和终点的坐标
+    int snake_count = 0; // 蛇的数量计数器，初始为0
+    map<pair<int, int>, int> snake_map; // 蛇的位置映射表，用于记录蛇的位置以及对应的编号
+
+    // 读取地图数据，并记录起点、终点和蛇的位置
+    for (int i = 0; i < n; ++i) {
+      for (int j = 0; j < n; ++j) {
+        cin >> palace[i][j]; // 读取地图数据
+        if (palace[i][j] == 'K') { // 如果是起点
+          start = {i, j}; // 记录起点坐标
+        } else if (palace[i][j] == 'T') { // 如果是终点
+          target = {i, j}; // 记录终点坐标
+        } else if (palace[i][j] == 'S') { // 如果是蛇
+          snake_map[{i, j}] = snake_count; // 将蛇的位置映射到蛇的编号
+          snake_count++; // 蛇的数量加1
+        }
+      }
+    }
+
+    priority_queue<State> pq; // 定义优先队列，用于存储状态，并根据状态的时间排序
+    map<tuple<int, int, int>, int> visited; // 记录状态是否访问过以及访问时的时间
+
+    pq.push(State(start.first, start.second, 0, 0, 0)); // 将起点状态加入优先队列
+    visited[{start.first, start.second, 0}] = 0; // 标记起点状态已访问，时间为0
+
+    int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 定义四个方向的增量数组
+    bool found = false; // 标记是否找到终点
+    int min_time = -1; // 记录找到终点时的最短时间
+
+    // 使用Dijkstra算法搜索最短路径
+    while (!pq.empty()) { // 当优先队列不为空时循环
+      State cur = pq.top(); // 取出优先队列中时间最短的状态
+      pq.pop(); // 将该状态从优先队列中移除
+
+      // 如果当前状态是终点状态且拥有全部钥匙，则找到了终点
+      if (cur.i == target.first && cur.j == target.second &&
+          cur.keys == (1 << m) - 1) {
+        found = true; // 标记找到了终点
+        min_time = cur.time; // 记录找到终点时的时间
+        break; // 结束循环
+      }
+
+      // 遍历当前状态的四个方向
+      for (auto dir : directions) {
+        int ni = cur.i + dir[0]; // 计算下一步的行坐标
+        int nj = cur.j + dir[1]; // 计算下一步的列坐标
+
+        // 如果下一步在地图内且不是障碍物
+        if (ni >= 0 && nj >= 0 && ni < n && nj < n && palace[ni][nj] != '#') {
+          int new_keys = cur.keys; // 新状态的钥匙数量初始化为当前状态的钥匙数量
+          int new_time = cur.time + 1; // 新状态的时间为当前状态的时间加1
+          int new_snake = cur.snake; // 新状态的蛇的状态初始化为当前状态的蛇的状态
+
+          // 如果下一步是蛇且当前状态未拥有该蛇对应的钥匙
+          if (palace[ni][nj] == 'S' &&
+              !(cur.snake & (1 << snake_map[{ni, nj}]))) {
+            ++new_time; // 则花费额外时间
+            new_snake |= (1 << snake_map[{ni, nj}]); // 更新蛇的状态
+          }
+
+          // 如果下一步是门且当前状态已拥有该门对应的全部钥匙
+          if (palace[ni][nj] >= '1' && palace[ni][nj] <= '9') {
+            int key = palace[ni][nj] - '1'; // 计算门对应的钥匙编号
+            if ((cur.keys & ((1 << key) - 1)) == ((1 << key) - 1)) {
+              new_keys |= (1 << key); // 则可以打开门，更新钥匙数量
+            }
+          }
+
+          // 如果新状态未被访问过
+          if (!visited.count({ni, nj, new_keys})) {
+              // 记录新状态的访问时间
+            visited[{ni, nj, new_keys}] = new_time;
+              // 将新状态加入优先队列
+            pq.push(State(ni, nj, new_keys, new_time, new_snake));
+          }
+        }
+      }
+    }
+
+    if (found) {
+      cout << min_time << endl;
+    } else {
+      cout << "impossible" << endl;
+    }
+  }
+  return 0;
+}
+```
+
+> 思考:优先队列的使用,位掩码记录状态
+>
+> debug:使用记录父节点的方式的记录路径(但是要注意这样的做的内存泄漏)
+>
+> 使用map记录已经存在的状态
+>
+> 注意搜索途中对环境的改变

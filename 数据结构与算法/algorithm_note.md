@@ -161,7 +161,7 @@ int main() {
       auto iter =
           lower_bound(location.begin(), location.end(), last_pos + distance);
       if (iter != location.end()) {
-        count++;
+        count++; 
         last_pos = *(iter);
       } else {
         right = distance - 1;
