@@ -3003,7 +3003,7 @@ class Solution:
 >   file2
 >   file3
 >   file4
->           
+>                   
 >   DATA SET 2:
 >   ROOT
 >   file1
@@ -3508,7 +3508,7 @@ int main() {
 >   5 0 90 30
 >   99 50 0 10
 >   999 1 2 0
->         
+>                 
 >   样例输入2：
 >   5
 >   0 18 13 98 8
@@ -3525,7 +3525,7 @@ int main() {
 >   ```
 >   样例输出1：
 >   100
->         
+>                 
 >   样例输出2：
 >   137
 >   ```
@@ -3913,3 +3913,660 @@ int main() {
 > 使用map记录已经存在的状态
 >
 > 注意搜索途中对环境的改变
+
+
+
+## [OpenJudge - B:Pots](http://cxsjsx.openjudge.cn/hw202417/B/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   You are given two pots, having the volume of **A** and **B** liters respectively. The following operations can be performed:  FILL(i)    fill the pot **i** (1 ≤ **i** ≤ 2) from the tap; DROP(i)   empty the pot **i** to the drain; POUR(i,j)  pour from pot **i** to pot **j**; after this operation either the pot **j** is full (and there may be some water left in the pot **i**), or the pot **i** is empty (and all its contents have been moved to the pot **j**).  Write a program to find the shortest possible sequence of these operations that will yield exactly **C** liters of water in one of the pots.
+>
+> - 输入
+>
+>   On the first and only line are the numbers **A**, **B**, and **C**. These are all integers in the range from 1 to 100 and **C**≤max(**A**,**B**).
+>
+> - 输出
+>
+>   The first line of the output must contain the length of the sequence of operations **K**. The following **K** lines must each describe one operation. If there are several sequences of minimal length, output any one of them. If the desired result can’t be achieved, the first and only line of the file must contain the word ‘**impossible**’.
+>
+> - 样例输入
+>
+>   ```
+>   3 5 4
+>   ```
+>
+>   
+>
+> - 样例输出
+>
+>   ```
+>   6
+>   FILL(2)
+>   POUR(2,1)
+>   DROP(1)
+>   POUR(2,1)
+>   FILL(2)
+>   POUR(2,1)
+>   ```
+
+```c++
+#include <climits>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <vector>
+
+using namespace std;
+// 建模: 一共有6种操作:装满a;倒掉a;装满b;倒掉b;把a倒到b里;把b倒到a里
+// 目标: 经过最少的操作次数,在一个锅里剩下c的水,输出操作的步骤
+// 优化: 在特定状态下,需要的步数如果大于当前存储的步数,则剪枝(使用map存储状态)
+// 实现: BFS + 队列
+// 使用结构体记录a,b的状态和通过何种操作到达该状态和上一个状态的指针
+struct situation {
+  int a, b, last_step, steps;
+  // step 0 1 2 3 4 5
+  situation *prev;
+  situation(int a, int b, int last_step, situation *prev)
+      : a(a), b(b), last_step(last_step), prev(prev) {
+    if (prev == nullptr) {
+      steps = 0;
+    } else {
+      steps = prev->steps + 1;
+    }
+  }
+};
+void print_ways(int a) {
+  switch (a) {
+  case 0:
+    cout << "DROP(1)" << endl;
+    break;
+  case 1:
+    cout << "FILL(1)" << endl;
+    break;
+  case 2:
+    cout << "DROP(2)" << endl;
+    break;
+  case 3:
+    cout << "FILL(2)" << endl;
+    break;
+  case 4:
+    cout << "POUR(1,2)" << endl;
+    break;
+  case 5:
+    cout << "POUR(2,1)" << endl;
+    break;
+  default:
+    break;
+  }
+}
+
+int main() {
+  int a, b, c;
+  cin >> a >> b >> c;
+  situation *start = new situation(0, 0, -1, nullptr);
+  map<pair<int, int>, int> visited;
+  queue<situation *> q;
+  q.push(start);
+  bool found = false;
+  situation *target_situation = nullptr;
+  int min_steps = 0;
+  while (!q.empty() && !found) {
+    situation *cur = q.front();
+    q.pop();
+    if (cur->a == c || cur->b == c) {
+      found = true;
+      target_situation = cur;
+      min_steps = cur->steps;
+    } else {
+      if (cur->a > 0) { // 倒掉a
+        int new_a = 0;
+        int new_b = cur->b;
+        int new_steps = cur->steps + 1;
+        int new_last_step = 0;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+      if (cur->a < a) { // 装满a
+        int new_a = a;
+        int new_b = cur->b;
+        int new_steps = cur->steps + 1;
+        int new_last_step = 1;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+      if (cur->b > 0) { // 倒掉b
+        int new_a = cur->a;
+        int new_b = 0;
+        int new_steps = cur->steps + 1;
+        int new_last_step = 2;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+      if (cur->b < b) { // 装满b
+        int new_a = cur->a;
+        int new_b = b;
+        int new_steps = cur->steps + 1;
+        int new_last_step = 3;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+      if (cur->a > 0 && cur->b < b) {
+        // 把a倒到b里
+        int new_a = 0;
+        int new_b = cur->b + cur->a;
+        if (cur->a + cur->b >= b) { // a倒不完
+          new_b = b;
+          new_a = cur->a + cur->b - b;
+        }
+
+        int new_steps = cur->steps + 1;
+        int new_last_step = 4;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+      if (cur->a < a && cur->b > 0) {
+        // 把b倒到a里
+        int new_a = cur->a + cur->b;
+        int new_b = 0;
+        if (cur->a + cur->b >= a) { // b倒不完
+          new_a = a;
+          new_b = cur->a + cur->b - a;
+        }
+        int new_steps = cur->steps + 1;
+        int new_last_step = 5;
+        if (visited.count({new_a, new_b}) == 0 ||
+            visited[{new_a, new_b}] > new_steps) {
+          visited[{new_a, new_b}] = new_steps;
+          q.push(new situation(new_a, new_b, new_last_step, cur));
+        }
+      }
+    }
+  }
+  if (found) {
+    cout << min_steps << endl;
+    vector<int> ans;
+    while (target_situation != nullptr) {
+      ans.push_back(target_situation->last_step);
+      target_situation = target_situation->prev;
+    }
+    for (auto item : vector<int>(ans.rbegin(), ans.rend())) {
+      print_ways(item);
+    }
+  } else {
+    cout << "impossible" << endl;
+  }
+  return 0;
+}
+```
+
+## [OpenJudge - C:Charm Bracelet](http://cxsjsx.openjudge.cn/hw202418/C/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   Bessie has gone to the mall's jewelry store and spies a charm bracelet. Of course, she'd like to fill it with the best charms possible from the *N*(1 ≤ *N*≤ 3,402) available charms. Each charm *i*in the supplied list has a weight *Wi*(1 ≤ *Wi*≤ 400), a 'desirability' factor *Di*(1 ≤ *Di*≤ 100), and can be used at most once. Bessie can only support a charm bracelet whose weight is no more than *M*(1 ≤ *M*≤ 12,880).Given that weight limit as a constraint and a list of the charms with their weights and desirability rating, deduce the maximum possible sum of ratings. 
+>
+> - 输入
+>
+>   Line 1: Two space-separated integers: N and M Lines 2..N+1: Line i+1 describes charm i with two space-separated integers: Wi and Di
+>
+> - 输出
+>
+>   Line 1: A single integer that is the greatest sum of charm desirabilities that can be achieved given the weight constraints
+>
+> - 样例输入
+>
+> ```
+> 4 6
+> 1 4
+> 2 6
+> 3 12
+> 2 7
+> ```
+>
+> - 样例输出
+>
+> ```
+> 23
+> ```
+>
+> - 来源
+>
+> USACO 2007 December Silver
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+// 思路: 背包问题,动态规划
+// 超出内存限制
+int main() {
+  int n, m;
+  cin >> n >> m;
+  vector<int> w(n + 1), v(n + 1);
+  for (int i = 1; i < n + 1; i++) {
+    cin >> w[i] >> v[i];
+  }
+  vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (i >= w[j]) {
+        dp[j][i] = max(dp[j - 1][i - w[j]] + v[j], dp[j - 1][i]);  // 去或者不去
+      } else {
+        dp[j][i] = dp[j - 1][i];  // 不取
+      }
+    }
+  }
+  cout << dp[n][m] << endl;
+  return 0;
+}
+```
+
+
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+// 思路: 背包问题,动态规划
+int main() {
+  int n, m;
+  cin >> n >> m;
+  vector<int> w(n + 1), v(n + 1);
+  for (int i = 1; i < n + 1; i++) {
+    cin >> w[i] >> v[i];
+  }
+  vector<int> dp(m + 1, 0);
+  for (int i = 1; i < n + 1; i++) {  // 考虑物品种类
+    for (int j = m; j >= 0; j--) {
+      if (j >= w[i]) { // 正向更新不能给出正确的答案
+        dp[j] = max(dp[j - w[i]] + v[i], dp[j]);
+      }
+    }
+  }
+  cout << dp[m] << endl;
+  return 0;
+}
+```
+
+## [OpenJudge - D:课程大作业](http://cxsjsx.openjudge.cn/hw202418/D/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   小明是北京大学信息科学技术学院三年级本科生。他喜欢参加各式各样的校园社团。这个学期就要结束了，每个课程大作业的截止时间也快到了，可是小明还没有开始做。每一门课程都有一个课程大作业，每个课程大作业都有截止时间。如果提交时间超过截止时间X天，那么他将会被扣掉X分。对于每个大作业，小明要花费一天或者若干天来完成。他不能同时做多个大作业，只有他完成了当前的项目，才可以开始一个新的项目。小明希望你可以帮助他规划出一个最好的办法(完成大作业的顺序)来减少扣分。
+>
+> - 输入
+>
+>   输入包含若干测试样例。 输入的第一行是一个正整数T，代表测试样例数目。 对于每组测试样例，第一行为正整数N（1 <= N <= 15）代表课程数目。 接下来N行，每行包含一个字符串S（不多于50个字符）代表课程名称和两个整数D（代表大作业截止时间）和C（完成该大作业需要的时间）。 注意所有的课程在输入中出现的顺序按照字典序排列。
+>
+> - 输出
+>
+>   对于每组测试样例，请输出最小的扣分以及相应的课程完成的顺序。 如果最优方案有多个，请输出字典序靠前的方案。
+>
+> - 样例输入
+>
+>   ```
+>   2 
+>   3 
+>   Computer 3 3 
+>   English 20 1 
+>   Math 3 2 
+>   3
+>   Computer 3 3 
+>   English 6 3 
+>   Math 6 3
+>   ```
+>
+> - 样例输出
+>
+>   ```
+>   2 
+>   Computer 
+>   Math 
+>   English 
+>   3 
+>   Computer 
+>   English 
+>   Math
+>   ```
+>
+> - 提示
+>
+>   第二个测试样例, 课程完成顺序Computer->English->Math 和 Computer->Math->English 都会造成3分罚分, 但是我们选择前者,因为在字典序中靠前.
+
+```c++
+#include <algorithm>
+#include <climits>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+class homework {
+ public:
+  string name;
+  int ddl;
+  int sp;
+  friend istream& operator>>(istream& is, homework& hw) {
+    is >> hw.name >> hw.ddl >> hw.sp;
+    return is;
+  }
+} v[16];
+
+struct Node {
+  int pre;
+  int min_score;
+  int finish_day;
+  int last;
+} dp[1 << 16];
+string get_path(int state) {
+  string res = "";
+  int cur_state = state;
+  while (cur_state) {
+    int last = dp[cur_state].last;
+    res = v[last].name + " " + res;
+    cur_state = dp[cur_state].pre;
+  }
+  return res;
+}
+int main() {
+  int T;
+  cin >> T;
+  while (T--) {
+    for (int i = 0; i < 1 << 16; i++) {
+      dp[i].pre = 0;
+      dp[i].min_score = INT_MAX;
+      dp[i].finish_day = 0;
+      dp[i].last = 0;
+    }
+    dp[0].min_score = 0;
+    int m;
+    cin >> m;
+    for (int i = 0; i < m; i++) {
+      cin >> v[i];
+    }
+    for (int state = 0; state < (1 << m); state++) {
+      for (int i = 0; i < m; i++) {
+        // 我为人人
+        if (!(state & (1 << i))) {
+          int next_state = state | (1 << i);
+          int finish_day = dp[state].finish_day + v[i].sp;
+          int score_penalty = max(0, finish_day - v[i].ddl);
+          int new_score = dp[state].min_score + score_penalty;
+          if (dp[next_state].min_score >= new_score) {
+            if (dp[next_state].min_score > new_score) {
+              dp[next_state].min_score = new_score;
+              dp[next_state].pre = state;
+              dp[next_state].finish_day = finish_day;
+              dp[next_state].last = i;
+            } else {
+              // 字典序并不只有该节点决定,节点的更新意味着前面的路发生了改变
+              string pre_o = get_path(state | (1 << i));
+              string cur_o = get_path(state) + " " + v[i].name;
+              if (cur_o < pre_o) {
+                dp[next_state].pre = state;
+                dp[next_state].finish_day = finish_day;
+                dp[next_state].last = i;
+              }
+            }
+          }
+        }
+      }
+    }
+    int final_state = (1 << m) - 1;
+    cout << dp[final_state].min_score << endl;
+
+    vector<string> ans;
+    while (final_state != 0) {
+      int last_task = dp[final_state].last;
+      ans.push_back(v[last_task].name);
+      final_state = dp[final_state].pre;
+    }
+
+    reverse(ans.begin(), ans.end());
+    for (const string& name : ans) {
+      cout << name << endl;
+    }
+  }
+
+  return 0;
+}
+```
+
+> 状态压缩 最好路径的新的记录方式
+
+## [OpenJudge - B:硬币](http://cxsjsx.openjudge.cn/hw202418/B/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   262144kB
+>
+> - 描述
+>
+>   宇航员Bob有一天来到火星上，他有收集硬币的习惯。于是他将火星上所有面值的硬币都收集起来了，一共有n种，每种只有一个：面值分别为a1,a2… an。 Bob在机场看到了一个特别喜欢的礼物，想买来送给朋友Alice，这个礼物的价格是X元。Bob很想知道为了买这个礼物他的哪些硬币是必须被使用的，即Bob必须放弃收集好的哪些硬币种类。飞机场不提供找零，只接受恰好X元。
+>
+> - 输入
+>
+>   第一行包含两个正整数n和x。（1 <= n <= 200, 1 <= x <= 10000) 第二行从小到大为n个正整数a1, a2, a3 … an （1 <= ai <= 10000)
+>
+> - 输出
+>
+>   第一行是一个整数，即有多少种硬币是必须被使用的。 第二行是这些必须使用的硬币的面值（从小到大排列）。
+>
+> - 样例输入
+>
+>   `5 18`
+>
+>   ` 1 2 3 5 10`
+>
+> - 样例输出
+>
+>   `2 `
+>
+>   `5 10`
+>
+> - 提示
+>
+>   输入数据将保证给定面值的硬币中至少有一种组合能恰好能够支付X元。 如果不存在必须被使用的硬币，则第一行输出0，第二行输出空行。
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  int n, x;
+  cin >> n >> x;
+  vector<int> coin(n + 1);  // 硬币面值
+  for (int i = 1; i <= n; i++) {
+    cin >> coin[i];
+  }
+  vector<int> dp(x + 1, 0);   // 方案总数
+  vector<int> ans(x + 1, 0);  // ans[j]: 去除i硬币的组成j方案数(滚动)
+  vector<int> necessary;
+  dp[0] = 1;
+  // 注意数组的更新顺序
+  for (int i = 1; i <= n; i++) {
+    for (int j = x; j >= coin[i]; j--) {
+      dp[j] += dp[j - coin[i]];
+    }
+  }
+  for (int i = 1; i <= n; i++) {
+    for (int j = 0; j <= x; j++) {
+      if (j < coin[i]) {
+        ans[j] = dp[j];
+      } else {
+        ans[j] = dp[j] - ans[j - coin[i]];
+        // 去掉i硬币组成j-coin[i]的方案数,若在此基础上组成j,则必须包括i硬币
+      }
+    }
+    if (ans[x] == 0) {
+      necessary.push_back(i);
+    }
+  }
+  cout << necessary.size() << endl;
+  for (int i = 0; i < necessary.size(); i++) {
+    cout << coin[necessary[i]] << " ";
+  }
+  return 0;
+}
+
+```
+
+> ```
+> 解题思路
+> 这道题其实是背包问题的变种，从 n个硬币中选择，使其总和为m，将子问题划分为从前i个硬币中选择，使其总和为j，将子问题用 dp[i][j]描述。
+> 边界条件 dp[0][0] = 1，从前0个硬币中选择，其面值和为0，解法唯一，就是谁都不选。
+> 状态转移公式：dp[i][j] = dp[i-1][j] + dp[i-1][j-a[i]]
+> 用滚动数组方法简化成 dp[j] += dp[j-a[i]] ，但是j需要从最大取值开始遍历。
+> 动态规划结果就是：dp[j]表示从前n个硬币选择若干个，其和为j。
+> 再回到这道题，对于每一种和为m的选择方案，如果其中有一个硬币面值a[i]可以由其他面值的硬币表示出来，那么它就不是必须选择的硬币，即如果从所有硬币中去掉a[i]面值的硬币，dp[m]的值变成0，也就是没有方案能凑成m，那么a[i]就是不能缺少的硬币。
+> 这道题大致思路就是这么来的。
+> ```
+>
+> [dp算法 - poj 4120: 硬币 - zhangyue_lala - 博客园 (cnblogs.com)](https://www.cnblogs.com/zhangyue123/p/12559751.html)
+
+## [OpenJudge - A:UNIMODAL PALINDROMIC DECOMPOSITIONS](http://cxsjsx.openjudge.cn/hw202418/A/)
+
+> - 总时间限制: 
+>
+>   1000ms
+>
+> - 内存限制: 
+>
+>   65536kB
+>
+> - 描述
+>
+>   A sequence of positive integers is Palindromic if it reads the same forward and backward. For example: 23 11 15 1 37 37 1 15 11 23 1 1 2 3 4 7 7 10 7 7 4 3 2 1 1 A Palindromic sequence is Unimodal Palindromic if the values do not decrease up to the middle value and then (since the sequence is palindromic) do not increase from the middle to the end For example, the first example sequence above is NOT Unimodal Palindromic while the second example is. A Unimodal Palindromic sequence is a Unimodal Palindromic Decomposition of an integer N, if the sum of the integers in the sequence is N. For example, all of the Unimodal Palindromic Decompositions of the first few integers are given below: 1: (1) 2: (2), (1 1) 3: (3), (1 1 1) 4: (4), (1 2 1), (2 2), (1 1 1 1) 5: (5), (1 3 1), (1 1 1 1 1) 6: (6), (1 4 1), (2 2 2), (1 1 2 1 1), (3 3), (1 2 2 1), ( 1 1 1 1 1 1) 7: (7), (1 5 1), (2 3 2), (1 1 3 1 1), (1 1 1 1 1 1 1) 8: (8), (1 6 1), (2 4 2), (1 1 4 1 1), (1 2 2 2 1), (1 1 1 2 1 1 1), ( 4 4), (1 3 3 1), (2 2 2 2), (1 1 2 2 1 1), (1 1 1 1 1 1 1 1)  Write a program, which computes the number of Unimodal Palindromic Decompositions of an integer. 
+>
+> - 输入
+>
+>   Input consists of a sequence of positive integers, one per line ending with a 0 (zero) indicating the end.
+>
+> - 输出
+>
+>   For each input value except the last, the output is a line containing the input value followed by a space, then the number of Unimodal Palindromic Decompositions of the input value. See the example on the next page.
+>
+> - 样例输入
+>
+> ```
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> 8
+> 10
+> 23
+> 24
+> 131
+> 213
+> 92
+> 0
+> ```
+>
+> - 输出
+>
+> ```
+> 2 2
+> 3 2
+> 4 4
+> 5 3
+> 6 7
+> 7 5
+> 8 11
+> 10 17
+> 23 104
+> 24 199
+> 131 5010688
+> 213 1055852590
+> 92 331143
+> ```
+
+```c++
+#include <cstring>
+#include <iostream>
+using namespace std;
+int main() {
+  unsigned dp[512][512]; // 尚不明了为何数组放在全局位置就不行了,报错runtime error
+  memset(dp, 0, sizeof(dp));
+  for (int i = 1; i <= 512; i++) {
+    dp[i][i] = 1;
+    if (i % 2 == 0) {
+      dp[i][i / 2] = 1;
+    }
+  }
+  dp[3][1] = 1;
+  dp[4][1] = 2;
+  dp[4][2] = 1;
+  for (int i = 5; i < 512; i++) {               // 目标数值
+    for (int j = 1; j < 512; j++) {             // 左端数值
+      if (i - 2 * j >= j) {                     // 保持单峰分解的特性
+        for (int m = j; m <= i - 2 * j; m++) {  // 继承数值的左端值
+          dp[i][j] += dp[i - 2 * j][m];  // 方案是在该分解左右加上j
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  int n;
+  while (cin >> n) {
+    if (n == 0) {
+      break;
+    }
+    unsigned ans = 0;
+    for (int i = 1; i <= n; i++) {
+      ans += dp[n][i];
+    }
+    cout << n << " " << ans << endl;
+  }
+
+  return 0;
+}
+```
+
