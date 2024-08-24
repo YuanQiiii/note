@@ -6,13 +6,25 @@
 
 最大后验估计是一种基于贝叶斯理论的参数估计方法,它考虑了先验信息和样本数据,通过最大化后验概率来估计模型参数。下面我们来推导MAP估计的公式。
 
-假设我们有一个概率模型$p(x|\theta)$,其中$x$表示观测数据,$\theta$表示模型参数。根据贝叶斯公式,我们可以写出后验概率:
+假设我们有一个概率模型
+
+$p(x|\theta)$
+
+其中$x$表示观测数据,$\theta$表示模型参数。根据贝叶斯公式,我们可以写出后验概率:
 
 $$p(\theta|x)=\frac{p(x|\theta)p(\theta)}{p(x)} \tag{1}$$
 
 其中,$p(\theta)$是参数$\theta$的先验分布,$p(x)$是数据的边缘分布,也称为证据(evidence)。
 
-MAP估计的目标是找到后验概率$p(\theta|x)$最大时的参数值$\hat{\theta}_{MAP}$,即:
+MAP估计的目标是找到后验概率
+
+$p(\theta|x)$
+
+最大时的参数值
+
+$\hat{\theta}_{MAP}$
+
+即:
 
 $$\hat{\theta}_{MAP}=\arg\max_{\theta} p(\theta|x) \tag{2}$$
 
@@ -20,7 +32,15 @@ $$\hat{\theta}_{MAP}=\arg\max_{\theta} p(\theta|x) \tag{2}$$
 
 $$\hat{\theta}_{MAP}=\arg\max_{\theta} \frac{p(x|\theta)p(\theta)}{p(x)} \tag{3}$$
 
-由于分母$p(x)$与参数$\theta$无关,因此在最大化时可以忽略,简化为:
+由于分母
+
+$p(x)$
+
+与参数
+
+$\theta$
+
+无关,因此在最大化时可以忽略,简化为:
 
 $$\hat{\theta}_{MAP}=\arg\max_{\theta} p(x|\theta)p(\theta) \tag{4}$$
 
