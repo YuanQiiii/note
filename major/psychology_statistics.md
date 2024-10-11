@@ -279,16 +279,81 @@
 
 - z分布的性质properties
   - 形状shape
+    - ![image-20241009153103035](psychology_statistics.assets/image-20241009153103035.png)
+    - The distribution of z-scores will have exactly **the same shape** as the original distribution of scores. The transformation does not change the location of any individual score relative to others in the distribution.（只改变量纲，形状完全不变）
+    - ![image-20241009152457781](psychology_statistics.assets/image-20241009152457781.png)
   - 均值mean
+    - The z-score distribution will always have a mean of zero. 
   - 标准差standard deviation
+    - The distribution of z-scores will always have a standard deviation of 1.
+  - 作为一个转换的工具
+    - To create a simpler standardized distribution, you first select the mean and standard deviation that you would like for the new distribution. （先选出均值和标准差）
+    - Then, z-scores are used to identify each individual's position in the original distribution and to compute the individual's position in the new distribution. （Zscore确定原始数据在分布中的位置，在新的分布中位置由zscore确定）
+    - A **standardized distribution** is composed of scores that have been transformed to create predetermined values for μ and σ. Standardized distributions are used to make dissimilar distributions comparable.（不同的数据之间可以相互比较）
 
-包括z分数在内的标准化分布standardized distribution能提供哪些和location有关的信息
+- 包括z分数在内的标准化分布standardized distribution能提供哪些和location有关的信息
+
+  - •The fact that z-scores identify exact locations within a distribution means that z-scores can be used as descriptive statistics and as inferential statistics. 
+
+    –As descriptive statistics, z-scores describe exactly where each individual is located. 
+
+    –As inferential statistics, z-scores determine whether a specific sample is representative of its population, or is extreme and unrepresentative. 
+
+  - ![image-20241009154520458](psychology_statistics.assets/image-20241009154520458.png)
 
 ## 6 Probability and Distributions
 
-概率Probalility：条件conditional概率，加法公式addition law，贝叶斯公式bayes theorem
+- 概率Probalility
 
-离散型discrete随机变量：二项分布binomial（参数n，p的影响和形状shape），概率质量函数PMF、累计分布函数CDF，分布列，期望、方差、标准差，
+  - 条件conditional概率
+
+    - $P(A|B) = {P(AB) \over P(B)}$
+
+  - 加法公式addition law
+
+    - $P(A\or B) = P(A) + P(B) - P(AB)$
+
+  - 贝叶斯公式bayes theorem
+
+    - $P(A|B) = {P(B|A)*P(A)\over P(B)}$
+
+
+>  | 事实\预测 | Positive | Negative |
+>  | --------- | -------- | :------: |
+>  | True      | TP       |    FN    |
+>  | False     | FP       |    TN    |
+>
+> 特异性Specificity = TN / (TN + FP)
+>
+> 敏感性(召回率) Sensitivity = TP / (TP + FN)
+
+- 离散型discrete随机变量 (DRV)
+
+  - CRV
+
+- 二项分布binomial（参数n，p的影响和形状shape）
+
+  - $P(x) = C_n^{x}p^x(1-p)^{n-x}$
+  - ```r
+    rbinom(n, size, prob)
+    # n：生成随机数的数量。
+    # size：每次试验的次数。
+    # prob：每次试验成功的概率。
+    ```
+  - 
+
+- 概率质量函数PMF
+
+  - 针对于离散随机变量
+
+- 累计分布函数CDF
+- 分布列
+- 期望Expected Value
+
+  - 
+
+- 方差
+- 标准差
 
 连续型continuous随机变量：正态分布normal（参数mu，sigma的影响和形状shape），概率密度函数PDF，累计分布函数CDF，期望、方差、标准差
 
