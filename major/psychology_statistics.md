@@ -329,41 +329,148 @@
 
 - 离散型discrete随机变量 (DRV)
 
-  - CRV
+  - A random variable for which there exists a discrete set of values with specified probabilities is a **discrete random variable**.
+
+- CRV 连续型continuous随机变量
+
+  - A **continuous random variable** is a variable that can assume any value on a continuum (an uncountable number of values, cannot be enumerated)
 
 - 二项分布binomial（参数n，p的影响和形状shape）
 
   - $P(x) = C_n^{x}p^x(1-p)^{n-x}$
+
+    - n是试验次数，p是成功概率，x是要求的成功次数
+
   - ```r
     rbinom(n, size, prob)
     # n：生成随机数的数量。
     # size：每次试验的次数。
     # prob：每次试验成功的概率。
     ```
-  - 
+
+  - $\mu = E(X) = np$
+
+  - $\sigma =\sqrt{np(1-p)}$
 
 - 概率质量函数PMF
 
   - 针对于离散随机变量
+  -  A **Probability Mass Function** (PMF) is a mathematical relationship which assigns a probability to each possible value, *x*, of the discrete random variable *X.*
 
-- 累计分布函数CDF
 - 分布列
+
+  - 一般是表格形式
+
 - 期望Expected Value
 
-  - 
+  - $E(X) = \int_{-\infin}^{\infin}x*f(x)dx$
+  - $E(X) = \sum x*P(x)$
 
 - 方差
+
+  - $\sigma ^2 = \int_{-\infin}^{\infin}(x-\mu)^2f(x)dx$
+
 - 标准差
 
-连续型continuous随机变量：正态分布normal（参数mu，sigma的影响和形状shape），概率密度函数PDF，累计分布函数CDF，期望、方差、标准差
+  - $\sigma = \sqrt{\int_{-\infin}^{\infin}(x-\mu)^2f(x)dx}$
+
+
+- 正态分布normal（参数mu，sigma的影响和形状shape）
+  - $\mu$描述对称轴
+  - $\sigma $描述高矮胖瘦
+    - 越大越胖矮
+    - 越小越高瘦
+- 概率密度函数PDF
+  - The Probability Density Function (PDF,概率密度函数) of the random variable X is the curve such that the area under the curve between any two points *a* and *b* is equal to the probability that the random variable, *X,* falls between *a* and *b.*
+  - It is used extensively in methods of estimation and hypothesis testing (actually almost everything…).
+  -  $p(x) = \frac{1}{\sigma \sqrt{2\pi}}e^{-(x-\mu)^2\over 2\sigma^2}$ 正态分布
+- 累计分布函数CDF
+  - The Cumulative Distribution Function (CDF,累计分布函数,*F(a)*) of the random variable X evaluated at the point *a* is defined as the probability that X will take on values ≤ *a.* It is represented by the area under the PDF to the left of *a.* 
+  - 可以用于DRV
+  - $F(a) = Pr(X<=a) = \int_{-\infin}^{a}f(x)dx$
 
 ## 7 Normal Distribution 
 
-标准正态分布：累计分布函数CDF和百分位数percentile，对称性symmetry
+- 标准正态分布
+  - nN(0,1) is referred to as the standard normal distribution (标准正态分布，or unit normal, or **z distribution**). 
+  - Any normal distribution can be transformed into N(0, 1). 
+    - $if \space X\sim N(\mu,\sigma ^2),we \space have \space Y = \frac{X-\mu}{\sigma} \sim N(0,1)$ 一般正态分布: 和标准正态分布的关系
+  - 累计分布函数CDF和百分位数percentile
+    - The relative location of individual scores within a distribution can be described by percentiles and percentile ranks. 
+    - The **percentile rank** for a specific X value is the percentage of individuals with scores at or below that value. 
+    -  When a score is referred to by its rank, the score is called a **percentile**. The percentile rank for a score in a normal distribution is simply the proportion to the left of the score. 
+    - 常用的值
+      - $\Phi(1.96) = 0.975 = z_.975$   97.5%
+      - $\Phi(1.645) = 0.95=z_.95$  95%
+      - $\Phi(-1.96) = 0.025 = z_.025$   2.5%
+  - 对称性symmetry
 
-一般正态分布: 和标准正态分布的关系，近似二项分布（近似准确的条件when the approximation is good、具体计算、精确上下限real limits）
+- 近似二项分布（近似准确的条件when the approximation is good、具体计算、精确上下限real limits）
 
-样本均值分布distribution of sample means：抽样分布sampling distribution，中心极限定理central limit theorem（样本均值分布是正态分布的条件），大数定律law of large numbers，标准误standard error。
+  - **When *n* is large and *p* is not near 0 or 1,** the binomial distribution tends to be symmetric and is well approximated by a normal distribution with mean $μ=np$, variance $σ^2=npq$.
+
+  - **Use N(** **np,** **npq** **) to approximate it**
+
+  - **When the approximation is good**
+
+    - Rule of thumb for when approximation of Binomial by normal is “reasonably good”:
+
+       npq≥5
+
+       or *n* moderate and *p* away from 0 and 1.
+
+    - From the text book, the rule of thumb:
+
+       np>10 and nq>10
+
+  - **If X~ Binomial(n,p), then** Pr(a=<X=<b) is approximated by the area under an N(np,npq) curve from(a-0.5) to (b+0.5). 
+
+- 样本均值分布distribution of sample means
+
+  - The **distribution of sample means** is defined as the set of means from *all the possible random samples of a specific size* (*n*) selected from a specific population.
+  - The sample means should pile up around the population mean. 
+  - The pile of sample means should tend to form a normal-shaped distribution. See the **Central Limit Theorem**.
+  - In general, the larger the sample size *n*, the closer the sample means should be to the population mean, *μ*. See the **Law of Large Numbers**.
+  - The mean of the distribution of sample means is called the **Expected Value of** **M**, and is equal to the population mean *μ*.
+  - ![image-20241015154649341](psychology_statistics.assets/image-20241015154649341.png)
+  - Within the distribution of sample means, the location of each sample mean can be specified by a z-score,$z = \frac{M - \mu}{\sigma _M}$ ，**注意分母是标准误**
+
+- 抽样分布sampling distribution
+
+  - A **sampling distribution** is a distribution of statistics obtained by selecting *all the possible samples of a specific size* from a population.
+  - The distribution of sample means is an example of a sampling distribution, often called the sampling distribution of *M*.
+
+- 中心极限定理central limit theorem（样本均值分布是正态分布的条件）
+
+  - For any population with mean *μ* and standard deviation *σ*, the distribution of sample means for sample size *n* will have a mean of *μ* and a standard deviation of $\sigma \over \sqrt{n}$ and will approach a normal distribution as *n* approaches infinity.
+
+  - a cornerstone of inferential statistics
+
+  - ![image-20241015154327861](psychology_statistics.assets/image-20241015154327861.png)
+
+  - The distribution of sample means is perfectly or almost perfectly normal when either of the following two conditions is satisfied:
+
+    1. The population from which the samples are selected is a normal distribution. 
+
+    2. The number of scores (*n*) in each sample is relatively large, around 30 or more.
+
+- 标准误standard error（SE）
+
+  - The standard deviation of the distribution of sample means, $σ_M$, is called the **standard error of** **M**.
+  - The standard error provides a measure of how much distance is expected on average between a sample mean (*M*) and the population mean (*μ*).
+  - ![image-20241015154826595](psychology_statistics.assets/image-20241015154826595.png)
+    - $D(x+y) = {SS(x+y) \over n} = {SS(x)+SS(y) \over n} = {SS(x) \over n}+{SS(y) \over n} = D(x)+D(y)$
+  - ![image-20241015160127461](psychology_statistics.assets/image-20241015160127461.png)
+  - ![image-20241015161631218](psychology_statistics.assets/image-20241015161631218.png)
+
+- 大数定律law of large numbers
+
+  - The **law of large numbers** states that the larger the sample size (*n*), the more probable it is that the sample mean will be close to the population mean.
+  - ![image-20241015160327561](psychology_statistics.assets/image-20241015160327561.png)
+
+- ![image-20241015160410429](psychology_statistics.assets/image-20241015160410429.png)
+
+- ![image-20241015161337726](psychology_statistics.assets/image-20241015161337726.png)
 
 ## 8 Hypothesis Testing
 
