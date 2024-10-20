@@ -425,6 +425,12 @@
 
   - **If X~ Binomial(n,p), then** Pr(a=<X=<b) is approximated by the area under an N(np,npq) curve from(a-0.5) to (b+0.5). 
 
+  - **连续变量一定要使用精确上下限**
+
+  - > Example: A company produces smoke filters and knows that, on  average, 10% are defective and will not pass inspection.  What is the probability that at least 15% of a random  sample of 100 filters are defective? (**注意这里虽然是15，但是正态分布连续，使用14.5**) Let X = # defective filters in a random sample of 100.  If on average 10% of filters are defective and each filter is selected independently, then X can be assumed to follow Binomial distribution with n=100, p=0.10.
+    >
+    > ![image-20241016162617935](psychology_statistics.assets/image-20241016162617935.png)
+
 - 样本均值分布distribution of sample means
 
   - The **distribution of sample means** is defined as the set of means from *all the possible random samples of a specific size* (*n*) selected from a specific population.
@@ -432,6 +438,7 @@
   - The pile of sample means should tend to form a normal-shaped distribution. See the **Central Limit Theorem**.
   - In general, the larger the sample size *n*, the closer the sample means should be to the population mean, *μ*. See the **Law of Large Numbers**.
   - The mean of the distribution of sample means is called the **Expected Value of** **M**, and is equal to the population mean *μ*.
+  - 独立同分布![image-20241016164300154](psychology_statistics.assets/image-20241016164300154.png)
   - ![image-20241015154649341](psychology_statistics.assets/image-20241015154649341.png)
   - Within the distribution of sample means, the location of each sample mean can be specified by a z-score,$z = \frac{M - \mu}{\sigma _M}$ ，**注意分母是标准误**
 
@@ -462,6 +469,7 @@
     - $D(x+y) = {SS(x+y) \over n} = {SS(x)+SS(y) \over n} = {SS(x) \over n}+{SS(y) \over n} = D(x)+D(y)$
   - ![image-20241015160127461](psychology_statistics.assets/image-20241015160127461.png)
   - ![image-20241015161631218](psychology_statistics.assets/image-20241015161631218.png)
+  - 注意sd与sem
 
 - 大数定律law of large numbers
 
