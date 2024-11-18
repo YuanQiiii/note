@@ -1,7 +1,10 @@
 # Note
 
-the note for learning computer science
-
 > 希望在碌碌无为的时光里找到自己的可能并不存在的初心
->
-> 
+
+- archive 
+  - 归档的文件，包含已经学习过的内容
+- bookmark
+  - 书签与笔记
+- focus
+  - 当前正在学习的部分
