@@ -50,6 +50,40 @@
       - 知觉同现：说话者与听者共同面对同一知觉事件
     
   - 言语执行和口误
+  
+    - **斯本内现象**（spoonerism）
+  
+      - 在一个短语或句子中两个或更多个词的首音互换
+  
+        - > You have tasted the whole worm
+          >
+          > You have wasted the whole term
+  
+      - 不是随机的
+  
+        - > “slips of the tongue”会被说成“tips of the tongue”，但不会被说成“tlips of the tongue”，因为“tl”不能作为起始声音
+  
+      - **SLIP技术**（实验室诱导产生的斯本内现象）：(darn bore)有时会被说成(barn door)
+  
+        1. 要求参与者默读一些由词对构成的词表，这些词对为希望出现的斯本内现象的声音结构提供了模型。例如 (ball doze) (bash door) (bean deck) (bell dark)
+        2. 要求参与者大声说出像(darn bore)这样的词对
+  
+      - 当口误所产生的仍然是真实存在的词时，斯本内现象更可能出现
+  
+    - | 计划类型                                                     | 正确用法                                      | 口误                                          |
+      | ------------------------------------------------------------ | --------------------------------------------- | --------------------------------------------- |
+      | 选择最符合他们想法的内容词                                   | Grizzly和ghastly                              | grastly                                       |
+      | 把所选的词放在话语中的正确位置。因为说话者在产生话语时会计划话语的整体单元，所以，内容词有时会发生错位。 | A tank of gas;Wine is being serverd at dinner | A gas of tank ;Dinner is being server at wine |
+      | 必须说出想说的词。因为说话者要事先计划，所以有时会出现声音的错位。 | Left hemisphere Pass out                      | Heft lemisphere Pat ous                       |
+  
+  - 声音，词和结构的选择
+  
+    - 声音：特定的声音出现在特定位置的相对频率
+    - 词：刚刚说过的单词会使与之有关联的单词更难被接着说出
+    - 结构：最近听到的和理解的语言的句子结构会诱导产生与之结构相同的句子
+    - ![image-20241118164758000](gp.assets/image-20241118164758000.png)
+
+
 
 
 
