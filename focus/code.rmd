@@ -1,0 +1,110 @@
+## ANOVA
+
+-   one-way ANOVA
+-   repeated-measures ANOVA
+-   two-way ANOVA
+-   mixed ANOVA
+
+### one-way ANOVA
+
+-   适用条件：指的是考察单一因素的影响，此单⼀因素⾄少有三个⽔平，且不同⽔平分别作⽤于不同样本
+
+    -   可以看做是独⽴样本t检验的拓展版本，独⽴样本t检验只有两个样本
+
+    -   例⼦：随机选择三组被试，分别查看在开⻋时不进⾏通话、开⻋时使⽤蓝⽛⽿机通话、开⻋时⼿拿⼿机通话此三种因素对驾驶⽔平的影响
+
+-   前提假设
+
+    -   在每个条件内进⾏的观察结果都是**独⽴**的
+
+    -   在每个条件下的观测值的分布都是**正态分布**
+
+    -   在每个条件下的观测值的分布应该满⾜**⽅差⻬性**
+
+-   实现
+
+```{r}
+load("oneway.Rdata")
+head(oneway_data)
+```
+
+```{r}
+library(dplyr) 
+library(magrittr)
+library(stats)
+
+# 利⽤shapiro.test检验每个条件下的分布都是正态分布(假设2)
+
+oneway_data %>% print()
+oneway_data %>% group_by(condition) %>% print()
+oneway_data %>% group_by(condition) %>%summarise(
+    p_value = shapiro.test(performance)$p.value
+  )%>% print()
+
+
+
+
+shapiro_results_df <- oneway_data %>%
+  group_by(condition) %>%
+  summarise(
+    statistic = shapiro.test(performance)$statistic,
+    p_value = shapiro.test(performance)$p.value
+  )
+
+# 查看结果
+print(shapiro_results_df)
+```
+
+> 关于`%>%`的解释
+>
+> 在 R 中，管道操作符 `%>%` 主要由 `magrittr` 包引入，并被广泛用于 `dplyr` 包中。它可以将一个表达式的结果传递给下一个表达式，使代码更具可读性和流畅性。**管道操作符可以与许多函数一起使用，特别是那些接受数据框或向量作为输入的函数。**
+>
+> 以下是一些常见的支持管道操作符的函数和操作：
+>
+> ### **`dplyr` 包中的函数**
+>
+> -   **`filter()`**：筛选行
+>
+> -   **`select()`**：选择列
+>
+> -   **`mutate()`**：添加或修改列
+>
+> -   **`summarise()`**：汇总数据
+>
+> -   **`group_by()`**：按组分组
+>
+> -   **`arrange()`**：排序行
+>
+> -   **`rename()`**：重命名列
+>
+> -   **`left_join()`**、**`right_join()`**、**`inner_join()`**、**`full_join()`**：连接数据框
+>
+>     ### **`tidyr` 包中的函数**
+>
+>     -   **`gather()`**：将数据从宽格式转换为长格式
+>
+>     -   **`spread()`**：将数据从长格式转换为宽格式
+>
+>     -   **`separate()`**：将一个列分成多个列
+>
+>     -   **`unite()`**：将多个列合并为一个列
+>
+>     ### **`ggplot2` 包中的函数**
+>
+>     -   **`ggplot()`**：创建图形对象
+>
+>     -   **`geom_point()`**、**`geom_line()`**、**`geom_bar()`** 等：添加几何对象
+>
+>     -   **`facet_wrap()`**、**`facet_grid()`**：分面
+>
+>     ### **其他常见函数**
+>
+>     -   **`head()`**：查看数据框的前几行
+>
+>     -   **`tail()`**：查看数据框的后几行
+>
+>     -   **`summary()`**：查看数据摘要
+>
+>     -   **`str()`**：查看数据结构
+>
+>     -   **`print()`**：打印输出

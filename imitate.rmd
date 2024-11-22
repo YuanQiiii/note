@@ -1,0 +1,76 @@
+---
+title: "hw"
+author: "hongwei qin"
+date: "2024-11-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# 验证大数定律
+# 设置随机种子以确保结果可重复
+set.seed(123)
+# 样本数量
+n <- 10000
+# 计算样本均值的累积和并除以样本数量
+sample_means <- cumsum(runif(n)) / (1:n)
+# 绘制样本均值随样本数量变化的图
+plot(1:n, sample_means,
+     type = "l", col = "blue",
+     main = "大数定律验证",
+     xlab = "样本数量",
+     ylab = "样本均值"
+)
+# 添加水平线表示理论均值0.5
+abline(h = 0.5, col = "red")
+```
+
+
+```{r}
+# 验证中心极限定理
+# 设置随机种子以确保结果可重复
+set.seed(123)
+# 样本数量
+m <- 1000
+# 每个样本的大小
+n <- 100
+# 计算每个样本的均值
+sample_means <- # 生成一个长度为 m 的向量
+     # 向量的每个元素是 n 个均匀分布的随机数的平均值
+     replicate(m, mean(runif(n)))
+# 绘制样本均值的直方图
+hist(sample_means,
+     breaks = 30, probability = TRUE,
+     main = "中心极限定理验证",
+     xlab = "样本均值",
+     ylab = "频率"
+)
+# 添加正态分布曲线
+curve(dnorm(x, mean = mean(sample_means), sd = sd(sample_means)),
+     col = "red", lwd = 2, add = TRUE
+)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+data <- read.csv("output.csv")
+head(data)
+x <- data$Value
+x = sort(x) %>% print()
+n = length(x) %>% print()
+range = (x[n] - x[1]) %>% print()
+m = ceiling((1 + 3.222 * log(n))) %>% print()
+d = (range / m) %>% print()
+breaks = seq(x[1], x[n], by = d) %>% print()
+# 该代码生成一个直方图。
+# 参数解释如下：
+# - x: 用于绘制直方图的数据向量。
+# - breaks: 用于指定直方图中条形的分组方式，可以是一个数值向量或一个单一数值。
+# - freq: 一个逻辑值，指示直方图的 y 轴是否显示频率（TRUE）或概率密度（FALSE）。
+hist(x, breaks = breaks, freq = FALSE)
+lines(density(x), col = "red")
+```
